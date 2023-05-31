@@ -5,6 +5,6 @@ public class App
     public static void main(String[] args) throws Exception
     {
         FileSystemScanner s = new FileSystemScanner();
-        s.scan();
+        s.scan("scanMeDirectory");
     }
 }
