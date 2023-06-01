@@ -1,5 +1,7 @@
 package de.blubber_lounge.FileSystemScanner;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Random;
 
 import de.blubber_lounge.FileSystemScanner.node.Node;
@@ -49,10 +51,34 @@ public class FileSystemScanner
                 currentNode.addSubNode(dir);
                 readFileSystem(dir, f);
             } else {
-                File file = new File();
-                file.setName(f.getName());
-                currentNode.addSubNode(file);
-                readFileSystem(file, f);
+                FileType fileType = getFileType(f);
+                if(getImageTypes().contains(fileType.toString())) {
+                    // IMAGE FILES
+                    if(FileType.PNG == fileType) {
+                        System.out.println("asd");
+                        PNG imageFile = new PNG();
+                        imageFile.setName(f.getName());
+                        imageFile.setType(fileType);
+                        currentNode.addSubNode(imageFile);
+                        readFileSystem(imageFile, f);
+                    }
+
+                } else if(FileType.TXT == fileType) {
+                    // TEXT FILE
+
+                } else {
+                    // UNKOWN FILES
+                }
+
+                if(FileType.PNG != fileType) {
+                    File file = new File();
+
+                    file.setName(f.getName());
+                    file.setType(fileType);
+
+                    currentNode.addSubNode(file);
+                    readFileSystem(file, f);
+                }
             }
         }
     }
@@ -74,6 +100,38 @@ public class FileSystemScanner
     protected void ListSubNodesOfNode(Node node)
     {
         this.ListSubNodesOfNode(node, 0);
+    }
+
+    private FileType getFileType(java.io.File file)
+    {
+        int pos = file.getName().lastIndexOf(".");       //Get the last name of the path, then get the index of the last occurence of ".", this is to find the file extension type
+        if (pos == -1)
+            return FileType.UNKOWN;
+
+        String stringFileType = file.getName().substring(pos+1).toUpperCase();
+
+        if(!getEnumValues().contains(stringFileType))
+            return FileType.UNKOWN;
+
+        return FileType.valueOf(stringFileType);
+    }
+
+    private HashSet<String> getEnumValues()
+    {
+        HashSet<String> values = new HashSet<String>();
+        for (FileType c : FileType.values())
+            values.add(c.name());
+
+        return values;
+    }
+
+    private HashSet<String> getImageTypes()
+    {
+        HashSet<String> values = new HashSet<String>();
+        for (FileType c : FileType.imageTypes())
+            values.add(c.name());
+
+        return values;
     }
 
     private void generateManuelFileSystem()

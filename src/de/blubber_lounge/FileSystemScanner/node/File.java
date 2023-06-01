@@ -29,7 +29,7 @@ public class File extends Node
         return this.getName() + FancyOutput.arrow 
             +"FileType:"+ this.getType() + FancyOutput.seperator
             +"Size:"+ this.getSize() + FancyOutput.seperator
-            +"WxH:"+ this.getHeight() +"x"+ this.getHeight() + FancyOutput.seperator
+            +"WxH:"+ this.getWidth() +"x"+ this.getHeight() + FancyOutput.seperator
             +"Bit Depth:"+ this.getBitDepth() + FancyOutput.seperator
             +"Compression:"+ this.getCompression();
     }
