@@ -27,11 +27,12 @@ public class File extends Node
     {
         // return this.getObjectType() +" "+ this.getName();
         return this.getName() + FancyOutput.arrow 
-            +"FileType:"+ this.getType() + FancyOutput.seperator
+            +"{"+ this.getType() +"}"+ FancyOutput.seperator
             +"Size:"+ this.getSize() + FancyOutput.seperator
             +"WxH:"+ this.getWidth() +"x"+ this.getHeight() + FancyOutput.seperator
             +"Bit Depth:"+ this.getBitDepth() + FancyOutput.seperator
             +"Compression:"+ this.getCompression();
+            // +"Parent:"+ this.getParent().getName();
     }
 
     public long getSize()

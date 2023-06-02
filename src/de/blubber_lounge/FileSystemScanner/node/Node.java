@@ -6,9 +6,11 @@ import java.util.List;
 public abstract class Node implements INode
 {
     private boolean canHaveSubNodes = false;
+    private Node parent;
     private List<Node> subNodes = new ArrayList<Node>();
 
     private String name;
+    private long size;
     private int id;
 
     public boolean getCanHaveSubNodes()
@@ -19,6 +21,16 @@ public abstract class Node implements INode
     public void canHaveSubNodes(boolean canHaveSubNodes)
     {
         this.canHaveSubNodes = canHaveSubNodes;
+    }
+
+    public Node getParent()
+    {
+        return this.parent;
+    }
+
+    public void setParent(Node parent)
+    {
+        this.parent = parent;
     }
 
     public List<Node> getSubNodes()
@@ -36,6 +48,16 @@ public abstract class Node implements INode
         this.name = name;
     }
 
+    public long getSize()
+    {
+        return this.size;
+    }
+
+    public void setSize(long size)
+    {
+        this.size = size;
+    }
+
     public int getId()
     {
         return this.id;
@@ -48,6 +70,7 @@ public abstract class Node implements INode
 
     public void addSubNode(Node node)
     {
+        node.setParent(this);
         if(this.canHaveSubNodes)
             this.subNodes.add(node);
     }

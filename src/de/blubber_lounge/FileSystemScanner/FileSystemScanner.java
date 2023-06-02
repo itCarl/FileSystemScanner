@@ -1,8 +1,6 @@
 package de.blubber_lounge.FileSystemScanner;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Random;
+import java.util.*;
 
 import de.blubber_lounge.FileSystemScanner.node.Node;
 import de.blubber_lounge.FileSystemScanner.util.FancyOutput;
@@ -21,22 +19,30 @@ public class FileSystemScanner
     public void scan(String rootPath)
     {
         java.io.File root = new java.io.File(rootPath);
+        if (!root.exists() || !root.isDirectory()) {
+            System.out.println("Invalid directory path: " + rootPath);
+            return;
+        }
+
         Directory rootDir = new Directory();
         rootDir.setName(root.getName());
+        rootDir.setSize(root.length());
 
         System.out.println("Scan starting... \n");
         System.out.println("=== ROOT ===\n" + root.getName() +" (FullPath:"+ root.getAbsolutePath() + ")\n============");
 
         // MAIN PART
-        this.readFileSystem(rootDir, root);
+        this.readFileSystem(rootDir, root, rootDir);
 
         // OUTPUT        
         this.ListSubNodesOfNode(rootDir);
         
         System.out.println("\nScan Completed.");
+
+        // this.percentageBar();
     }
 
-    protected void readFileSystem(Node currentNode, java.io.File currentDirectory)
+    protected void readFileSystem(Node currentNode, java.io.File currentDirectory, Node latestDir)
     {
         java.io.File[] dirs = currentDirectory.listFiles();
         
@@ -49,18 +55,18 @@ public class FileSystemScanner
                 Directory dir = new Directory();
                 dir.setName(f.getName());
                 currentNode.addSubNode(dir);
-                readFileSystem(dir, f);
+                readFileSystem(dir, f, dir);
             } else {
                 FileType fileType = getFileType(f);
                 if(getImageTypes().contains(fileType.toString())) {
                     // IMAGE FILES
                     if(FileType.PNG == fileType) {
-                        System.out.println("asd");
                         PNG imageFile = new PNG();
                         imageFile.setName(f.getName());
                         imageFile.setType(fileType);
+                        imageFile.setSize(f.length());
                         currentNode.addSubNode(imageFile);
-                        readFileSystem(imageFile, f);
+                        readFileSystem(imageFile, f, latestDir);
                     }
 
                 } else if(FileType.TXT == fileType) {
@@ -75,10 +81,13 @@ public class FileSystemScanner
 
                     file.setName(f.getName());
                     file.setType(fileType);
+                    file.setSize(f.length());
 
                     currentNode.addSubNode(file);
-                    readFileSystem(file, f);
+                    readFileSystem(file, f, latestDir);
                 }
+
+                latestDir.setSize(latestDir.getSize()+f.length());
             }
         }
     }
@@ -132,6 +141,47 @@ public class FileSystemScanner
             values.add(c.name());
 
         return values;
+    }
+    public static final String TEXT_RESET = "\u001B[0m";
+    public static final String TEXT_BLACK = "\u001B[30m";
+    public static final String TEXT_RED = "\u001B[31m";
+    public static final String TEXT_GREEN = "\u001B[32m";
+    public static final String TEXT_YELLOW = "\u001B[33m";
+    public static final String TEXT_BLUE = "\u001B[34m";
+    public static final String TEXT_PURPLE = "\u001B[35m";
+    public static final String TEXT_CYAN = "\u001B[36m";
+    public static final String TEXT_WHITE = "\u001B[37m";
+
+    private void percentageBar()
+    {
+        Random rnd = new Random();
+        int t = 0;
+        int[] sizes = new int[]{50, 150, 100, 50, 100, 200, 500, 25, 60, 3};
+        String[] colors = new String[]{"\u001B[31m", "\u001B[32m", "\u001B[33m", "\u001B[34m", "\u001B[36m"};
+        int total = 0;
+        for (int i : sizes)
+            total += i;
+        System.out.println("\n");
+        for(int i = 0; i < sizes.length; i++) {
+            String clr = colors[(i%(colors.length-1))];//colors[rnd.nextInt(colors.length-1)];
+            float ans = map((sizes[i]*100) / total, 0, 100, 1, 10);
+            // System.out.println(ans);
+            for(int j = 0; j <= ans; j++ ) {
+                if(ans < 2) {
+                    System.out.print(clr+"~"); 
+                }else {
+                    System.out.print(clr+"=");
+                }               
+            }
+            t++;
+        }
+        System.out.println(t);
+        System.out.println("\n");
+    }
+
+    float map(float x, float in_min, float in_max, float out_min, float out_max)
+    {
+        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
     }
 
     private void generateManuelFileSystem()
